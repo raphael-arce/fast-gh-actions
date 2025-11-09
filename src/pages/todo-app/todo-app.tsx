@@ -4,9 +4,18 @@ import { Stats } from "./components/stats";
 import { Header } from "./components/header";
 import { PendingTodos } from "./components/pending-todos";
 import { CompletedTodos } from "./components/completed-todos";
+import { useSession } from "../../stores/use-session";
+import { PendingConfirmation } from "../../components/pending-confirmation";
 
 export function TodoApp() {
   const { todos } = useTodos();
+  const { session } = useSession();
+
+  const confirmed = session?.user?.email_confirmed_at;
+
+  if (!confirmed) {
+    return <PendingConfirmation />;
+  }
 
   const pendingTodos = todos.filter((todo) => todo.status === "pending");
   const completedTodos = todos.filter((todo) => todo.status === "completed");

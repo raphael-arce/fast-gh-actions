@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabaseClient } from "../api/supabase-client";
+import { PendingConfirmation } from "../components/pending-confirmation";
 
 export function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,48 +22,18 @@ export function Register() {
 
     if (error) {
       alert(error.message);
+      setIsLoading(false);
       return;
     }
 
-    setSuccess(true);
-    setIsLoading(false);
+    setTimeout(() => {
+      setSuccess(true);
+      setIsLoading(false);
+    }, 1_000);
   };
 
   if (success) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4">
-        <div className="max-w-md w-full">
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4">
-              <svg
-                className="w-8 h-8 text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">
-              Check your email!
-            </h1>
-            <p className="text-gray-600 mb-6">
-              We've sent you a confirmation link, please click on it to confirm
-              your email address.
-            </p>
-            <a
-              href="/login"
-              className="inline-block py-2 px-4 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-all duration-200"
-            >
-              Back to Login
-            </a>
-          </div>
-        </div>
-      </div>
-    );
+    return <PendingConfirmation />;
   }
 
   return (
