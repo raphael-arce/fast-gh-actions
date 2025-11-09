@@ -1,18 +1,23 @@
 import { useEffect } from "react";
 import { useSession } from "../stores/use-session";
+import { usePathname } from "./use-pathname";
 
 export function useRedirects() {
   const { session } = useSession();
 
-  const pathname = window.location.pathname;
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (session) {
-      handleAuthenticated(pathname);
+    if (session === undefined) {
       return;
     }
 
-    handleUnauthenticated(pathname);
+    if (session === null) {
+      handleUnauthenticated(pathname);
+      return;
+    }
+
+    handleAuthenticated(pathname);
   }, [pathname, session]);
 }
 
@@ -21,7 +26,7 @@ export function handleAuthenticated(pathname: string) {
     return;
   }
 
-  history.pushState(null, "", "/");
+  window.location.href = "/";
 }
 
 export function handleUnauthenticated(pathname: string) {
@@ -33,5 +38,5 @@ export function handleUnauthenticated(pathname: string) {
     return;
   }
 
-  history.pushState(null, "", "/login");
+  window.location.href = "/login";
 }

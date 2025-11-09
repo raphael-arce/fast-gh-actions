@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function usePathname(): string {
+export function usePathname() {
   const [pathname, setPathname] = useState(window.location.pathname);
 
   useEffect(() => {
@@ -9,11 +9,9 @@ export function usePathname(): string {
     };
 
     window.addEventListener("locationchange", handleLocationChange);
-    window.addEventListener("popstate", handleLocationChange);
 
     return () => {
       window.removeEventListener("locationchange", handleLocationChange);
-      window.removeEventListener("popstate", handleLocationChange);
     };
   }, []);
 
