@@ -1,12 +1,14 @@
 // spec: TEST_PLAN.md#4-mark-todo-as-completed-tests
 
 import { expect } from "@playwright/test";
-import { withLoggedInUser } from "./fixtures/slow/with-logged-in-user";
+import { withLoggedInUser } from "./fixtures/fast/with-logged-in-user";
 
 withLoggedInUser.describe("Mark Todo as Completed Tests", () => {
   withLoggedInUser(
     "TODO-COMPLETE-001: Mark Single Todo as Completed",
     async ({ page }) => {
+      await page.goto("/");
+
       // Add a pending todo
       await page.fill('input[name="todo"]', "Complete this task");
       await page.click('button[type="submit"]:has-text("Add Todo")');
@@ -43,6 +45,8 @@ withLoggedInUser.describe("Mark Todo as Completed Tests", () => {
   withLoggedInUser(
     "TODO-COMPLETE-002: Mark Multiple Todos as Completed",
     async ({ page }) => {
+      await page.goto("/");
+
       // Add 3 pending todos
       const todos = ["First task", "Second task", "Third task"];
       for (const todo of todos) {

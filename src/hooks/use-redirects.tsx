@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useSession } from "../stores/use-session";
-import { usePathname } from "./use-pathname";
+import { useLocation, useNavigate, type NavigateFunction } from "react-router";
 
 export function useRedirects() {
   const { session } = useSession();
 
-  const pathname = usePathname();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (session === undefined) {
@@ -13,23 +14,29 @@ export function useRedirects() {
     }
 
     if (session === null) {
-      handleUnauthenticated(pathname);
+      handleUnauthenticated(location.pathname, navigate);
       return;
     }
 
-    handleAuthenticated(pathname);
-  }, [pathname, session]);
+    handleAuthenticated(location.pathname, navigate);
+  }, [location, session]);
 }
 
-export function handleAuthenticated(pathname: string) {
+export function handleAuthenticated(
+  pathname: string,
+  navigate: NavigateFunction,
+) {
   if (pathname === "/") {
     return;
   }
 
-  window.location.href = "/";
+  navigate("/");
 }
 
-export function handleUnauthenticated(pathname: string) {
+export function handleUnauthenticated(
+  pathname: string,
+  navigate: NavigateFunction,
+) {
   if (pathname.includes("/login")) {
     return;
   }
@@ -38,5 +45,5 @@ export function handleUnauthenticated(pathname: string) {
     return;
   }
 
-  window.location.href = "/login";
+  navigate("/login");
 }
