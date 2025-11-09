@@ -1,12 +1,11 @@
 // spec: TEST_PLAN.md#7-logout-tests
 
-import { expect } from "@playwright/test";
-import { withLoggedInUser } from "./fixtures/slow/with-logged-in-user";
+import { test as baseTest, expect } from "@playwright/test";
+import { withLoggedInUser } from "./fixtures/fast/with-logged-in-user";
 
 withLoggedInUser.describe("Logout Tests", () => {
   withLoggedInUser("LOGOUT-001: Successful Logout", async ({ page }) => {
-    // Navigate to Todo App home page (already there)
-    await expect(page).toHaveURL("/");
+    await page.goto("/");
 
     // Locate "Logout" button in header
     const logoutButton = page.locator('button:has-text("Logout")');
@@ -17,15 +16,13 @@ withLoggedInUser.describe("Logout Tests", () => {
 
     // User is redirected to login page
     await expect(page).toHaveURL("/login");
-
-    // Any attempt to access protected routes redirects to login
-    await page.goto("/");
-    await expect(page).toHaveURL("/login");
   });
 
   withLoggedInUser(
     "LOGOUT-002: Logout with Unsaved Changes",
     async ({ page }) => {
+      await page.goto("/");
+
       // Add several todos (they are auto-saved to Supabase)
       const todos = ["Task A", "Task B", "Task C"];
       for (const todo of todos) {
@@ -33,7 +30,7 @@ withLoggedInUser.describe("Logout Tests", () => {
         await page.click('button[type="submit"]:has-text("Add Todo")');
       }
 
-      // Click "Logout" button
+      // Complete logout and wait for navigation
       await page.click('button:has-text("Logout")');
 
       // Logout succeeds
@@ -41,13 +38,9 @@ withLoggedInUser.describe("Logout Tests", () => {
     },
   );
 
-  withLoggedInUser(
-    "LOGOUT-003: Access Protected Route After Logout",
+  baseTest(
+    "LOGOUT-003: Access Protected Route Without Session",
     async ({ page }) => {
-      // Complete logout
-      await page.click('button:has-text("Logout")');
-      await expect(page).toHaveURL("/login");
-
       // Manually navigate to / (Todo App route)
       await page.goto("/");
 

@@ -1,29 +1,19 @@
-import { usePathname } from "./hooks/use-pathname";
+import { Route, Routes } from "react-router";
 import { useRedirects } from "./hooks/use-redirects";
 import { Login } from "./pages/login";
 import { Register } from "./pages/register";
 import { TodoApp } from "./pages/todo-app/todo-app";
-import { useSession } from "./stores/use-session";
 
 function App() {
-  const { session } = useSession();
-  const pathname = usePathname();
-
   useRedirects();
 
-  if (session) {
-    return <TodoApp />;
-  }
-
-  if (pathname.includes("/register")) {
-    return <Register />;
-  }
-
-  if (pathname.includes("/login")) {
-    return <Login />;
-  }
-
-  return <></>;
+  return (
+    <Routes>
+      <Route index element={<TodoApp />} />
+      <Route path="login" element={<Login />} />
+      <Route path="register" element={<Register />} />
+    </Routes>
+  );
 }
 
 export default App;

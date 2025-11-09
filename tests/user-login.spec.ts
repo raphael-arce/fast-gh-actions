@@ -1,7 +1,7 @@
 // spec: TEST_PLAN.md#2-user-login-tests
 
 import { test, expect } from "@playwright/test";
-import { withRegisteredUser } from "./fixtures/slow/with-registered-user";
+import { withRegisteredUser } from "./fixtures/fast/with-registered-user";
 
 withRegisteredUser.describe("User Login Tests", () => {
   withRegisteredUser(

@@ -1,7 +1,7 @@
 // spec: TEST_PLAN.md#3-add-todo-tests
 
 import { expect } from "@playwright/test";
-import { withLoggedInUser } from "./fixtures/slow/with-logged-in-user";
+import { withLoggedInUser } from "./fixtures/fast/with-logged-in-user";
 
 withLoggedInUser.describe("Add Todo Tests", () => {
   withLoggedInUser("TODO-ADD-001: Add Single Todo", async ({ page }) => {
@@ -69,6 +69,8 @@ withLoggedInUser.describe("Add Todo Tests", () => {
   withLoggedInUser(
     "TODO-ADD-003: Add Todo with Empty Input",
     async ({ page }) => {
+      await page.goto("/");
+
       const todoInput = page.locator('input[name="todo"]');
 
       // Leave todo input field empty
@@ -88,6 +90,8 @@ withLoggedInUser.describe("Add Todo Tests", () => {
   withLoggedInUser(
     "TODO-ADD-004: Add Todo with Special Characters",
     async ({ page }) => {
+      await page.goto("/");
+
       const todoInput = page.locator('input[name="todo"]');
 
       // Enter todo with special characters
