@@ -21,9 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: supabase/setup-cli@v1
-        with:
-          version: latest
+      # - uses: supabase/setup-cli@v1
+      #   with:
+      #     version: latest
 
       - name: Start Supabase local development setup
         run: supabase start --exclude edge-runtime,imgproxy,logflare,postgres-meta,realtime,storage-api,supavisor,vector &
@@ -32,39 +32,39 @@ jobs:
         with:
           node-version-file: ".nvmrc"
 
-      - name: Cache npm dependencies
-        id: cache-npm-deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+      # - name: Cache npm dependencies
+      #   id: cache-npm-deps
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       **/node_modules
+      #     key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        if: steps.cache-npm-deps.outputs.cache-hit != 'true'
+        # if: steps.cache-npm-deps.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Install Playwright Browsers
         # run: npx playwright install --with-deps "${{ matrix.browser }}"
         run: npx playwright install --with-deps
 
-      - name: Cache frontend build
-        id: cache-frontend-build
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./dist
-          key: ${{ runner.os }}-node-frontend-${{ hashFiles('./src/**/*', 'package-lock.json') }}
+      # - name: Cache frontend build
+      #   id: cache-frontend-build
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       ./dist
+      #     key: ${{ runner.os }}-node-frontend-${{ hashFiles('./src/**/*', 'package-lock.json') }}
 
-      - name: Build frontend
-        if: steps.cache-frontend-build.outputs.cache-hit != 'true'
-        run: npm run build
+      # - name: Build frontend
+      #   # if: steps.cache-frontend-build.outputs.cache-hit != 'true'
+      #   run: npm run build
 
       - name: Wait for Supabase to be ready
         run: |
           timeout=600
           counter=0
-          until curl -s http://localhost:54321/rest/v1/ >/dev/null; do
+          until curl -s http://127.0.0.1:54321/rest/v1/ >/dev/null; do
             if [ $counter -gt $timeout ]; then
               echo "Timed out waiting for Supabase"
               exit 1
@@ -86,3 +86,7 @@ jobs:
           name: test-results
           path: test-results
           retention-days: 30
+
+      - name: Stop Supabase local development setup
+        if: always()
+        run: supabase stop --no-backup
