@@ -51,7 +51,7 @@ withRegisteredUser.describe("User Login Tests", () => {
     // Click "Sign In" button
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toContain("");
-      dialog.accept();
+      dialog.accept().catch((error) => console.error("WARNING:", error));
     });
     await page.click('button[type="submit"]');
 
@@ -72,7 +72,7 @@ withRegisteredUser.describe("User Login Tests", () => {
     // Click "Sign In" button
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toContain("");
-      dialog.accept();
+      dialog.accept().catch((error) => console.error("WARNING:", error));
     });
     await page.click('button[type="submit"]');
 

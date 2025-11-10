@@ -73,7 +73,7 @@ test.describe("User Registration Tests", () => {
     // Click "Create Account" button
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toContain("");
-      dialog.accept();
+      dialog.accept().catch((error) => console.error("WARNING:", error));
     });
     await page.click('button[type="submit"]');
 
@@ -96,7 +96,7 @@ test.describe("User Registration Tests", () => {
       expect(dialog.message()).toContain(
         "Password should be at least 6 characters.",
       );
-      dialog.accept();
+      dialog.accept().catch((error) => console.error("WARNING:", error));
     });
     await page.click('button[type="submit"]');
 

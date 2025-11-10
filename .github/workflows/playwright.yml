@@ -5,8 +5,13 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-
     runs-on: ubuntu-latest
+
+    env:
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+      TEST_SUPABASE_SERVICE_ROLE_KEY: ${{ vars.TEST_SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_MAILPIT_URL: ${{ vars.TEST_MAILPIT_URL }}
 
     strategy:
       fail-fast: true
@@ -70,11 +75,6 @@ jobs:
           echo "Supabase is ready!"
 
       - name: Run Playwright tests
-        env:
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
-          TEST_SUPABASE_SERVICE_ROLE_KEY: ${{ vars.TEST_SUPABASE_SERVICE_ROLE_KEY }}
-          TEST_MAILPIT_URL: ${{ vars.TEST_MAILPIT_URL }}
         run: npm run test -- --project="${{ matrix.browser }}"
 
       - uses: actions/upload-artifact@v4
