@@ -19,7 +19,7 @@ export default defineConfig({
   timeout: 60_000,
   maxFailures: 1,
   /* Run tests in files in parallel */
-  fullyParallel: false,
+  fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
@@ -80,7 +80,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: `${process.env.CI ? "npm run preview -- --port 5173" : "npm run dev"}`,
+    command: "npm run dev",
     url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
   },
