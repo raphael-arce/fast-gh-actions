@@ -1,73 +1,35 @@
-# React + TypeScript + Vite
+# Fast GitHub Actions - Todo App Example
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A demonstration repository showcasing e2e test optimization techniques for GitHub Actions workflows. This example accompanies [this blog post](https://raphael.arce.de/blog/faster-gh-actions/) on reducing CI/CD workflow times from 10 minutes to under 1 minute through strategic improvements in test fixtures, parallelization, and caching.
 
-Currently, two official plugins are available:
+Disclaimer: The code was mainly generated with AI and probably has some issues.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Key Optimizations Demonstrated
 
-## React Compiler
+- Fast Test Fixtures: Mock authentication via Supabase JS instead of UI interactions (~0.3s vs ~3.5s)
+- Parallel Execution: Matrix strategy for browser-specific test runs
+- Background Installations: Non-blocking setup of Playwright browsers and Supabase
+- Self-hosted Runner Support: Optional configuration for even faster execution (~41s total)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the ESLint configuration
+- React + Vite + TypeScript
+- Supabase (Auth & Database)
+- Playwright (E2E Testing)
+- GitHub Actions (CI/CD)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# Local Development
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Install then start supabase locally:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+supabase start
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Then you can run the app:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Read the full blog post for detailed explanations and performance comparisons: https://raphael.arce.de/blog/faster-gh-actions/
