@@ -23,7 +23,7 @@ Disclaimer: The code was mainly generated with AI and probably has some issues.
 Install then start supabase locally:
 
 ```bash
-supabase start
+npx supabase start
 ```
 
 Then you can run the app:
