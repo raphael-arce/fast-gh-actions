@@ -1,6 +1,6 @@
 import { Session } from "@supabase/supabase-js";
 import { test as baseTest } from "@playwright/test";
-import { supabaseAnonClient } from "../supabase.ts";
+import { supabaseAnonClient } from "../supabase";
 import { withRegisteredUser } from "./with-registered-user";
 
 type WithLoggedInUser = {

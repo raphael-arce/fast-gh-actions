@@ -1,0 +1,30 @@
+name: Playwright Tests (Vercel Sandbox)
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Install sandbox SDK
+        run: npm install @vercel/sandbox
+
+      - name: Run tests in Vercel Sandboxes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          TEST_SUPABASE_SERVICE_ROLE_KEY: ${{ vars.TEST_SUPABASE_SERVICE_ROLE_KEY }}
+          TEST_MAILPIT_URL: ${{ vars.TEST_MAILPIT_URL }}
+        run: node scripts/vercel/ci-sandbox-run.mjs
