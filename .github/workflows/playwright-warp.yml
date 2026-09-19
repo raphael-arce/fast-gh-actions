@@ -1,0 +1,101 @@
+name: Playwright Tests (WarpBuild Snapshot)
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    # Boots from the latest snapshot for this alias if one exists,
+    # otherwise from the base image. Snapshot is re-saved at the end of
+    # every run, so node_modules / Playwright browsers / Supabase docker
+    # images carry over incrementally.
+    runs-on: warp-ubuntu-latest-x64-8x;snapshot.key=fast-gh-actions-playwright
+
+    env:
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+      TEST_SUPABASE_SERVICE_ROLE_KEY: ${{ vars.TEST_SUPABASE_SERVICE_ROLE_KEY }}
+      TEST_MAILPIT_URL: ${{ vars.TEST_MAILPIT_URL }}
+
+    steps:
+      - name: Report snapshot state
+        run: echo "Booted from snapshot='${WARPBUILD_SNAPSHOT_KEY:-<none, base image>}'"
+
+      # clean: false keeps node_modules + .npm state from the snapshot.
+      # (default checkout does `git clean -ffdx`, which would wipe them)
+      - uses: actions/checkout@v5
+        with:
+          clean: false
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase local development setup
+        run: supabase start --exclude edge-runtime,imgproxy,logflare,postgres-meta,realtime,storage-api,supavisor,vector &
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: ".nvmrc"
+
+      # Only reinstall when the lockfile actually changed since the snapshot
+      - name: Install dependencies
+        run: |
+          LOCK_HASH=$(sha256sum package-lock.json | cut -d' ' -f1)
+          MARKER="$HOME/.npm-ci-lock-hash"
+          if [ -d node_modules ] && [ -f "$MARKER" ] && [ "$(cat "$MARKER")" = "$LOCK_HASH" ]; then
+            echo "node_modules up to date (from snapshot), skipping npm ci"
+          else
+            npm ci
+            echo "$LOCK_HASH" > "$MARKER"
+          fi
+
+      # Browsers live in ~/.cache/ms-playwright, which persists in the snapshot.
+      # This is a no-op once they're already there.
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Wait for Supabase to be ready
+        run: |
+          timeout=600
+          counter=0
+          until curl -s http://127.0.0.1:54321/rest/v1/ >/dev/null; do
+            if [ $counter -gt $timeout ]; then
+              echo "Timed out waiting for Supabase"
+              exit 1
+            fi
+            echo "Waiting for Supabase to be ready..."
+            sleep 1
+            counter=$((counter + 1))
+          done
+          echo "Supabase is ready!"
+
+      - name: Run Playwright tests
+        run: npm run test
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() && !cancelled() }}
+        with:
+          name: test-results
+          path: test-results
+          retention-days: 30
+
+      - name: Stop Supabase local development setup
+        if: always()
+        run: supabase stop --no-backup
+
+      # Drop credentials and run-specific junk, but keep node_modules and caches
+      - name: Cleanup before snapshot
+        if: always()
+        run: |
+          rm -rf "$HOME/.ssh" "$HOME/.aws" "$HOME/.docker/config.json"
+          rm -rf test-results playwright-report
+
+      - name: Save snapshot
+        if: always()
+        uses: WarpBuilds/snapshot-save@v1
+        with:
+          alias: "fast-gh-actions-playwright"
+          fail-on-error: false
+          wait-timeout-minutes: 60
