@@ -5,7 +5,7 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     env:
       VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
@@ -21,9 +21,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # - uses: supabase/setup-cli@v1
-      #   with:
-      #     version: latest
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
       - name: Start Supabase local development setup
         run: supabase start --exclude edge-runtime,imgproxy,logflare,postgres-meta,realtime,storage-api,supavisor,vector &
