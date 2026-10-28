@@ -18,15 +18,16 @@ export function addTodo(text: string) {
     status: "pending",
   } as const;
 
-  const newTodos = [...todos, todo];
+  todos.push(todo);
 
-  useTodos.setState({ todos: newTodos });
+  useTodos.setState({ todos });
 }
 
 export function removeTodo(id: string) {
   const { todos } = useTodos.getState();
 
-  const newTodos = todos.filter((todo) => todo.id !== id);
+  // Remove the todo with the given id
+  const newTodos = todos.filter((todo) => todo.id === id);
 
   useTodos.setState({ todos: newTodos });
 }
