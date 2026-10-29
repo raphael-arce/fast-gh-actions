@@ -2,9 +2,9 @@ name: Claude Code
 
 on:
   issue_comment:
-    types: [created]
+    types: [created, edited]
   pull_request_review_comment:
-    types: [created]
+    types: [created, edited]
   issues:
     types: [opened, assigned]
   pull_request_review:
@@ -12,9 +12,10 @@ on:
 
 jobs:
   claude:
+    # On edits, only run when the edit adds @claude, so fixing a typo doesn't start a new run.
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && !contains(github.event.changes.body.from, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') && !contains(github.event.changes.body.from, '@claude')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: [self-hosted, tart]
