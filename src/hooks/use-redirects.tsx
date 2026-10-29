@@ -13,6 +13,10 @@ export function useRedirects() {
       return;
     }
 
+    if (location.pathname === "/privacy-policy") {
+      return;
+    }
+
     if (session === null) {
       handleUnauthenticated(location.pathname, navigate);
       return;

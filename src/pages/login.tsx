@@ -142,7 +142,10 @@ export function Login() {
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="text-blue-500 hover:text-blue-600">
+            <a
+              href="/privacy-policy"
+              className="text-blue-500 hover:text-blue-600"
+            >
               Privacy Policy
             </a>
           </p>
