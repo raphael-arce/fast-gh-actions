@@ -30,6 +30,10 @@ export function handleAuthenticated(
     return;
   }
 
+  if (pathname.includes("/privacy-policy")) {
+    return;
+  }
+
   navigate("/");
 }
 
@@ -42,6 +46,10 @@ export function handleUnauthenticated(
   }
 
   if (pathname.includes("/register")) {
+    return;
+  }
+
+  if (pathname.includes("/privacy-policy")) {
     return;
   }
 
