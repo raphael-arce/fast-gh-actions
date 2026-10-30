@@ -9,6 +9,10 @@ jobs:
     # Restored from a memory snapshot: Supabase, Vite, node_modules and browsers
     # are already there (see runner-loop-vz.sh in persisting-github-actions).
     runs-on: [self-hosted, vz]
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
 
     steps:
       # The workspace is a symlink to the repo in the snapshot. clean: false keeps
@@ -27,11 +31,11 @@ jobs:
         # Empty CI so Playwright reuses the Vite server from the snapshot.
         run: |
           source ~/.nvm/nvm.sh
-          CI= npx playwright test --reporter=line
+          CI= npx playwright test --reporter=line --project=${{ matrix.browser }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ failure() && !cancelled() }}
         with:
-          name: test-results
+          name: test-results-${{ matrix.browser }}
           path: test-results
           retention-days: 30
