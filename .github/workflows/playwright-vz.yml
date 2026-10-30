@@ -1,0 +1,37 @@
+name: Playwright Tests (vz snapshot)
+on:
+  push:
+    branches: [ci/vz-snapshot-runner]
+  workflow_dispatch:
+jobs:
+  test:
+    timeout-minutes: 10
+    # Restored from a memory snapshot: Supabase, Vite, node_modules and browsers
+    # are already there (see runner-loop-vz.sh in persisting-github-actions).
+    runs-on: [self-hosted, vz]
+
+    steps:
+      # The workspace is a symlink to the repo in the snapshot. clean: false keeps
+      # node_modules and .env.
+      - uses: actions/checkout@v5
+        with:
+          clean: false
+
+      - name: Install dependencies if the lockfile changed
+        run: |
+          source ~/.nvm/nvm.sh
+          # HEAD@{1} is the commit the snapshot was taken at.
+          git diff --quiet 'HEAD@{1}' HEAD -- package-lock.json || npm ci
+
+      - name: Run Playwright tests
+        # Empty CI so Playwright reuses the Vite server from the snapshot.
+        run: |
+          source ~/.nvm/nvm.sh
+          CI= npx playwright test --reporter=line
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() && !cancelled() }}
+        with:
+          name: test-results
+          path: test-results
+          retention-days: 30
