@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
+        shard: [1, 2, 3]
 
     steps:
       # The workspace is a symlink to the repo in the snapshot. clean: false keeps
@@ -31,11 +31,11 @@ jobs:
         # Empty CI so Playwright reuses the Vite server from the snapshot.
         run: |
           source ~/.nvm/nvm.sh
-          CI= npx playwright test --reporter=line --project=${{ matrix.browser }}
+          CI= npx playwright test --reporter=line --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ failure() && !cancelled() }}
         with:
-          name: test-results-${{ matrix.browser }}
+          name: test-results-${{ matrix.shard }}
           path: test-results
           retention-days: 30
